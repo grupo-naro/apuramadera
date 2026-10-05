@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * ───────────────────────────────────────────────────────────────
+ * Design system base
+ *
+ * Tokens semánticos en variables CSS. Los componentes consumen
+ * SIEMPRE tokens (`bg-background`, `text-primary`…), nunca valores
+ * literales. La identidad concreta (qué oklch toma cada token) la
+ * inyecta `<ThemeStyle/>` desde `store.config.ts` en el root layout
+ * — así clonar la tienda es sólo editar la config, sin tocar CSS.
+ * ───────────────────────────────────────────────────────────────
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Selección: tinta sólida sobre hueso — coherente con el look galería. */
+  ::selection {
+    background-color: var(--foreground);
+    color: var(--background);
+  }
+}
+
+/* Oculta la barra de scroll manteniendo el scroll funcional — para los
+   strips horizontales con scroll-snap de la home. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Indicador de scroll del hero — la ruedita del "mouse" baja y se
+   desvanece. Se usa con `[animation:am-scroll-hint_…]`. */
+@keyframes am-scroll-hint {
+  0% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  35% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(7px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+}

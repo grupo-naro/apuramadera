@@ -1,0 +1,513 @@
+// ─────────────────────────────────────────────────────────────
+// Commerce Core · Prisma schema
+// Docs del modelo: investigaciones/roadmap-tecnico-framework.html
+//
+// Generador `prisma-client` (Prisma 7) → src/generated/prisma
+// La URL de la base vive en prisma.config.ts (no en este archivo).
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 1 · M1.1 — Modelo de catálogo
+//
+// Esquema genérico: sirve a cualquier vertical (ropa, electro,
+// muebles, cosmética…) sin cambiar el schema. La vertical es
+// CONTENIDO (categorías + atributos), no código.
+//
+// Convenciones de dominio:
+//  · El dinero SIEMPRE en centavos (Int). 3990 = $39,90.
+//  · Atributos de producto normalizados:
+//      Product → ProductOption → ProductOptionValue
+//      ProductVariant ←→ ProductOptionValue (vía ProductVariantOption)
+//  · El Product es el concepto; la ProductVariant es la unidad
+//    vendible (la que tiene SKU, precio y stock).
+//  · Un "producto simple" = 1 variante y 0 opciones.
+// ═══════════════════════════════════════════════════════════════
+
+enum ProductStatus {
+  DRAFT // borrador, no visible en el storefront
+  ACTIVE // publicado y visible
+  ARCHIVED // retirado, conserva historial
+}
+
+/// Árbol de categorías. La vertical de la tienda se siembra
+/// como un set de categorías + atributos (ver M4.7, blueprints).
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  // Jerarquía self-referencing: una categoría puede tener una
+  // categoría padre y varias hijas.
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  products ProductCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+}
+
+/// Producto conceptual ("Remera Oversize"). No tiene precio ni
+/// stock propios: eso vive en cada ProductVariant.
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  status      ProductStatus @default(DRAFT)
+
+  // SEO — lo consume M1.6. Opcional para no bloquear la carga.
+  metaTitle       String?
+  metaDescription String?
+
+  // Modelo 3D para la vista AR de la PDP (visualizar el mueble en el
+  // baño del cliente). `publicId` de un asset `raw` en Cloudinary.
+  // El `.usdz` (iOS Quick Look) se genera desde el `.glb` al subirlo;
+  // ambos null ⇒ el producto no ofrece AR.
+  modelGlbPublicId  String?
+  modelUsdzPublicId String?
+
+  categories ProductCategory[]
+  images     ProductImage[]
+  options    ProductOption[]
+  variants   ProductVariant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+/// Join explícito Product ↔ Category (relación muchos-a-muchos).
+/// Un producto puede estar en varias categorías a la vez.
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+  @@index([categoryId])
+}
+
+/// Imágenes del producto. `publicId` es el identificador del asset en
+/// Cloudinary; las URLs optimizadas se arman en runtime. El orden lo
+/// define `sortOrder`.
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  publicId  String
+  alt       String?
+  sortOrder Int     @default(0)
+
+  @@index([productId])
+}
+
+/// Eje de variación de un producto: "Talle", "Color", "Voltaje".
+/// Es la abstracción que vuelve genérico al esquema entre verticales.
+model ProductOption {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  sortOrder Int     @default(0)
+
+  values ProductOptionValue[]
+
+  // No puede repetirse el mismo eje dentro de un producto.
+  @@unique([productId, name])
+  @@index([productId])
+}
+
+/// Valor concreto de un eje: "M", "Negro", "220V".
+model ProductOptionValue {
+  id        String        @id @default(cuid())
+  optionId  String
+  option    ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  value     String
+  sortOrder Int           @default(0)
+
+  variants ProductVariantOption[]
+
+  @@unique([optionId, value])
+  @@index([optionId])
+}
+
+/// Unidad vendible real. Es lo que se agrega al carrito.
+/// Tiene SKU, precio (centavos) y stock propios.
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sku  String? @unique
+  name String? // ej. "Negro / M" — opcional, se puede derivar de las opciones
+
+  price          Int // centavos
+  compareAtPrice Int? // centavos — precio "tachado" / lista anterior
+  stock          Int  @default(0)
+  weightGrams    Int? // peso para cotización de envío (F2)
+
+  isActive Boolean @default(true)
+
+  optionValues ProductVariantOption[]
+  cartItems    CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+/// Join: qué combinación de valores de opción define a una variante.
+/// Ej.: la variante "Negro / M" se enlaza al value "Negro" y al "M".
+model ProductVariantOption {
+  variantId     String
+  optionValueId String
+  variant       ProductVariant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  optionValue   ProductOptionValue @relation(fields: [optionValueId], references: [id], onDelete: Cascade)
+
+  @@id([variantId, optionValueId])
+  @@index([optionValueId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 2 · M2.1 — Carrito
+//
+// El carrito vive en la base y se identifica por una cookie
+// (`cart_id`). `userId` queda preparado para vincularlo al usuario
+// en la Fase 3 (fusión de carritos al loguear); todavía sin relación.
+// ═══════════════════════════════════════════════════════════════
+
+model Cart {
+  id     String     @id @default(cuid())
+  userId String? // se vincula al User en F3 — por ahora sólo anónimo
+  items  CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// Línea del carrito: una variante con su cantidad. El precio NO se
+/// guarda acá — el carrito muestra precio vivo; el snapshot se toma
+/// recién al crear la orden (M2.3).
+model CartItem {
+  id        String         @id @default(cuid())
+  cartId    String
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Una sola fila por variante en cada carrito.
+  @@unique([cartId, variantId])
+  @@index([cartId])
+  @@index([variantId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 2 · M2.3 — Órdenes
+//
+// La orden es un documento INMUTABLE: congela snapshots de precio,
+// nombre y atributos al momento de la compra. Si el producto cambia
+// después, la orden histórica no se toca. `number` legible y
+// secuencial, separado del `id`.
+// ═══════════════════════════════════════════════════════════════
+
+enum OrderStatus {
+  PENDING // creada, esperando confirmación de pago
+  PAID // pago confirmado
+  FULFILLED // preparada para envío
+  SHIPPED // despachada
+  DELIVERED // entregada
+  CANCELLED // cancelada
+  REFUNDED // reembolsada
+}
+
+model Order {
+  id     String      @id @default(cuid())
+  number Int         @unique @default(autoincrement())
+  status OrderStatus @default(PENDING)
+
+  // Contacto (compra como invitado). `customerId` se vincula al
+  // User en F3; por ahora la orden guarda el contacto directo.
+  customerId   String?
+  email        String
+  customerName String
+  phone        String?
+
+  // Envío — snapshot del método elegido (M2.2 define los métodos).
+  shippingMethod String
+  shippingCost   Int    @default(0) // centavos
+
+  // Dirección de entrega — null si es retiro en local.
+  shippingRecipient  String?
+  shippingStreet     String?
+  shippingApartment  String?
+  shippingCity       String?
+  shippingProvince   String?
+  shippingPostalCode String?
+  shippingNotes      String?
+
+  // Totales en centavos. total = subtotal + shippingCost.
+  subtotal Int
+  total    Int
+
+  // Pago — lo completa M2.5 (id del pago en MercadoPago).
+  paymentId String?
+
+  // Código de seguimiento del envío — lo carga el admin (M4.1).
+  trackingCode String?
+
+  // Cupón aplicado — snapshot inmutable (M6.3). `couponId` es un
+  // puntero blando (sin FK): si el cupón se borra, la orden
+  // mantiene el detalle. Descuento en centavos, ya descontado del total.
+  couponId       String?
+  couponCode     String?
+  couponDiscount Int     @default(0)
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// Ítem de orden: snapshot inmutable de lo comprado. `variantId` y
+/// `productId` son punteros blandos (SIN relación ni FK) — si el
+/// producto se borra, la orden permanece intacta.
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  variantId String? // puntero informativo, sin FK
+  productId String? // puntero informativo, sin FK
+
+  // Snapshots tomados al momento de la compra.
+  productName   String
+  variantName   String? // ej. "Negro / M" — congela los atributos elegidos
+  sku           String?
+  imagePublicId String?
+  unitPrice     Int // centavos, precio al momento de comprar
+  quantity      Int
+  lineTotal     Int // unitPrice × quantity
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 3 · M3.1 — Autenticación (Auth.js v5)
+//
+// Esquema estándar del Prisma adapter de Auth.js. La tienda usa
+// magic link por email (provider Resend) — sólo `User` y
+// `VerificationToken` se llenan hoy; `Account`/`Session` quedan
+// para un eventual login OAuth.
+//
+// Las sesiones son JWT (sin filas en `Session`): el proxy valida
+// la sesión desde la cookie sin tocar la base.
+//
+// NO hay columna `role`: quién es admin lo define el allowlist
+// `ADMIN_EMAILS` (env), no la base — así clonar una tienda es sólo
+// cambiar una variable de entorno. Si más adelante hacen falta
+// roles persistidos (staff, clientes con cuenta), se agrega ahí.
+// ═══════════════════════════════════════════════════════════════
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  /// Hash scrypt `salt:hash`. Un User con hash tiene acceso al panel.
+  passwordHash       String?
+  /// DNI (sólo dígitos) de los usuarios creados desde el panel.
+  dni                String?   @unique
+  /// `true` hasta que el usuario cambie la clave inicial (su DNI).
+  mustChangePassword Boolean   @default(false)
+  /// Fallos de login consecutivos / bloqueo temporal.
+  failedLogins       Int       @default(0)
+  lockedUntil        DateTime?
+
+  accounts Account[]
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Token de un solo uso del magic link. Lo crea y consume el
+/// provider de email de Auth.js.
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 2 · M2.5 — Conexión de pagos (Mercado Pago OAuth)
+//
+// La tienda vincula su cuenta de Mercado Pago por OAuth desde el
+// panel. Como cada tienda es un clon independiente (no multitenant),
+// hay UNA sola conexión por proveedor — de ahí el `@unique`.
+//
+// `accessToken` y `refreshToken` se guardan CIFRADOS (el access
+// token mueve dinero). El access token vence a las ~6 h; se renueva
+// con el refresh token. `publicKey` no es secreta.
+// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 5 · M5.1 — CMS modular (bloques de la home)
+//
+// La home se arma con bloques ordenables. `data` es JSON: cada tipo
+// guarda su propia config, validada con Zod en el módulo `cms`.
+// `startsAt`/`endsAt` permiten programar banners (M5.3).
+// ═══════════════════════════════════════════════════════════════
+
+enum HomeBlockType {
+  HERO_BANNER
+  PRODUCT_CAROUSEL
+  CATEGORY_GRID
+}
+
+model HomeBlock {
+  id        String        @id @default(cuid())
+  type      HomeBlockType
+  /// Config específica del tipo — JSON validado con Zod (módulo cms).
+  data      Json
+  sortOrder Int           @default(0)
+  isActive  Boolean       @default(true)
+
+  /// Ventana de visibilidad — null = sin límite.
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 6 · M6.3 — Cupones
+//
+// Cupón de descuento por código. Aplica al SUBTOTAL (no al envío).
+// Sin stacking: un cupón por orden. El cupo es global (no per-customer
+// — el checkout es invitado). La orden conserva snapshot del código y
+// el descuento, así borrar un cupón no rompe órdenes históricas.
+// ═══════════════════════════════════════════════════════════════
+
+enum CouponType {
+  PERCENTAGE // value = porcentaje entero (1-100)
+  FIXED_AMOUNT // value = centavos a descontar
+}
+
+model Coupon {
+  id          String     @id @default(cuid())
+  /// Código que tipea el cliente. Se guarda en MAYÚSCULAS y el
+  /// matcheo es case-insensitive (se uppercasa la entrada).
+  code        String     @unique
+  type        CouponType
+  /// Porcentaje (1-100) o centavos según `type`.
+  value       Int
+  description String?
+  isActive    Boolean    @default(true)
+
+  /// Ventana de validez — null = sin límite.
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  /// Umbral de subtotal mínimo (centavos) — null = sin mínimo.
+  minSubtotal Int?
+
+  /// Cupo de usos — null = ilimitado. `usageCount` se incrementa
+  /// al confirmar la orden (no al sólo validar el código).
+  usageLimit Int?
+  usageCount Int  @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentConnection {
+  id       String @id @default(cuid())
+  /// "mercadopago" — preparado para otros proveedores a futuro.
+  provider String @unique @default("mercadopago")
+
+  /// Id del vendedor en Mercado Pago (numérico, guardado como texto).
+  mpUserId     String
+  /// Cifrados con AES-256-GCM (ver src/core/lib/encryption.ts).
+  accessToken  String
+  refreshToken String
+  /// Public key de MP — no secreta, se usa del lado del cliente.
+  publicKey    String
+  scope        String?
+  /// Vencimiento del access token.
+  expiresAt    DateTime
+
+  connectedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

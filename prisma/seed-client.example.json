@@ -1,0 +1,54 @@
+{
+  "categories": [
+    {
+      "name": "Indumentaria",
+      "slug": "indumentaria",
+      "sortOrder": 0
+    },
+    {
+      "name": "Remeras",
+      "slug": "remeras",
+      "parentSlug": "indumentaria",
+      "sortOrder": 0
+    },
+    {
+      "name": "Accesorios",
+      "slug": "accesorios",
+      "sortOrder": 1
+    }
+  ],
+  "products": [
+    {
+      "name": "Remera Oversize",
+      "slug": "remera-oversize",
+      "description": "Remera de algodón peinado, corte oversize.",
+      "status": "ACTIVE",
+      "categorySlugs": ["remeras"],
+      "images": [
+        { "publicId": "cld-sample", "alt": "Remera Oversize, frente" },
+        { "publicId": "cld-sample-2", "alt": "Remera Oversize, espalda" }
+      ],
+      "options": [
+        { "name": "Talle", "values": ["S", "M", "L"] },
+        { "name": "Color", "values": ["Negro", "Blanco"] }
+      ],
+      "variants": [
+        { "sku": "REM-OVS-NEG-S", "name": "Negro / S", "priceArs": 15999, "compareAtPriceArs": 19999, "stock": 5, "weightGrams": 220, "options": { "Talle": "S", "Color": "Negro" } },
+        { "sku": "REM-OVS-NEG-M", "name": "Negro / M", "priceArs": 15999, "compareAtPriceArs": 19999, "stock": 12, "weightGrams": 230, "options": { "Talle": "M", "Color": "Negro" } },
+        { "sku": "REM-OVS-BLA-M", "name": "Blanco / M", "priceArs": 15999, "compareAtPriceArs": 19999, "stock": 9, "weightGrams": 230, "options": { "Talle": "M", "Color": "Blanco" } }
+      ]
+    },
+    {
+      "name": "Gorra Trucker",
+      "slug": "gorra-trucker",
+      "description": "Gorra trucker de frente rígido y malla trasera. Talle único regulable.",
+      "status": "ACTIVE",
+      "categorySlugs": ["accesorios"],
+      "images": [{ "publicId": "cld-sample-4", "alt": "Gorra Trucker" }],
+      "options": [],
+      "variants": [
+        { "sku": "GOR-TRU-UNI", "priceArs": 8999, "stock": 30, "weightGrams": 110, "options": {} }
+      ]
+    }
+  ]
+}
