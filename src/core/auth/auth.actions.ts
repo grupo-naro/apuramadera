@@ -16,7 +16,12 @@ export async function loginAction(formData: FormData): Promise<void> {
   const password = String(formData.get("password") ?? "");
 
   try {
-    await signIn("credentials", { email, password, redirectTo: "/admin" });
+    // `/login/continuar` decide el destino real (ver `post-login.ts`).
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: "/login/continuar",
+    });
   } catch (error) {
     // AuthError = credenciales inválidas. El resto (NEXT_REDIRECT) se re-lanza.
     if (error instanceof AuthError) {

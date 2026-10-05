@@ -171,22 +171,25 @@ test.describe("primer ingreso de un usuario nuevo", () => {
       // 2) El usuario nuevo entra con el DNI y queda forzado a cambiar la clave.
       const userPage = await newUserContext.newPage();
       await login(userPage, email, dni);
-      // (Tras el login por Server Action el router cliente puede dejar la
-      // URL en /admin aunque el proxy ya sirvió la pantalla de cambio de
-      // clave, así que acá se verifica el contenido, no la URL.)
+      // La URL tiene que ser la de la pantalla que se ve: si quedara en
+      // /admin, el formulario enviaría su Server Action a /admin y el
+      // proxy la desviaría ("This page couldn't load", clave sin cambiar).
+      await expect(userPage).toHaveURL(/\/admin\/cambiar-clave$/);
       await expect(
         userPage.getByRole("heading", { name: "Cambiar clave" }),
       ).toBeVisible();
 
-      // El panel no se puede usar hasta cambiarla.
-      await userPage.goto("/admin/productos");
-      await expect(userPage).toHaveURL(/\/admin\/cambiar-clave/);
-
-      // 3) Cambia la clave (primero, una igual al DNI se rechaza).
+      // 3) Primer envío SIN recargar ni navegar antes (como lo hace un
+      // usuario real): una clave igual al DNI se rechaza con un mensaje
+      // en pantalla, no con una página de error.
       await userPage.getByLabel("Clave nueva").fill(dni);
       await userPage.getByLabel("Repetí la clave").fill(dni);
       await userPage.getByRole("button", { name: "Guardar clave" }).click();
       await expect(pageAlert(userPage)).toContainText("DNI");
+
+      // El panel no se puede usar hasta cambiarla.
+      await userPage.goto("/admin/productos");
+      await expect(userPage).toHaveURL(/\/admin\/cambiar-clave/);
 
       await userPage.getByLabel("Clave nueva").fill(newPassword);
       await userPage.getByLabel("Repetí la clave").fill(newPassword);
