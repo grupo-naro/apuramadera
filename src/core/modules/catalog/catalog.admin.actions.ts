@@ -11,9 +11,14 @@
  */
 import { revalidatePath } from "next/cache";
 
+import { deleteCloudinaryAssets } from "@/core/integrations/cloudinary/destroy";
+
+import { pickOrphanedAssetIds } from "./catalog.admin.assets";
 import {
   createProduct,
   deleteProduct,
+  findAssetIdsUsedByOtherProducts,
+  findProductAssetIds,
   updateProduct,
   type SaveProductData,
 } from "./catalog.admin.repository";
@@ -137,11 +142,44 @@ export async function saveProduct(
   return { ok: true };
 }
 
+/**
+ * Assets de Cloudinary del producto que nadie más usa (fotos y modelo
+ * 3D). Se calcula ANTES de borrarlo: después sus filas ya no existen.
+ */
+async function findOrphanedAssets(productId: string) {
+  const assets = await findProductAssetIds(productId);
+  if (!assets) return { image: [], raw: [] };
+
+  const [imagesInUse, modelsInUse] = await Promise.all([
+    findAssetIdsUsedByOtherProducts("image", assets.images, productId),
+    findAssetIdsUsedByOtherProducts("raw", assets.models, productId),
+  ]);
+  return {
+    image: pickOrphanedAssetIds(assets.images, imagesInUse),
+    raw: pickOrphanedAssetIds(assets.models, modelsInUse),
+  };
+}
+
 export async function deleteProductAction(
   productId: string,
 ): Promise<{ ok: true }> {
+  const orphaned = await findOrphanedAssets(productId);
+
   await deleteProduct(productId);
   revalidatePath("/admin/productos");
   revalidatePath("/");
+
+  // Después de borrar el producto, y sin hacerlo depender de Cloudinary:
+  // si el borrado de archivos falla, queda un huérfano, pero el producto
+  // ya se eliminó (mejor eso que no poder borrarlo).
+  try {
+    await deleteCloudinaryAssets(orphaned);
+  } catch (error) {
+    console.error(
+      "[catalog] No se pudieron borrar los assets de Cloudinary del producto",
+      productId,
+      error,
+    );
+  }
   return { ok: true };
 }

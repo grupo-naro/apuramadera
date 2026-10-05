@@ -467,3 +467,65 @@ export async function updateProduct(
 export async function deleteProduct(id: string): Promise<void> {
   await prisma.product.delete({ where: { id } });
 }
+
+// ─── Assets en Cloudinary ──────────────────────────────────────
+
+/**
+ * `publicId`s que un producto tiene en Cloudinary: fotos (`image`) y
+ * modelo 3D (`raw`: `.glb` / `.usdz`). `null` si el producto no existe.
+ */
+export async function findProductAssetIds(
+  id: string,
+): Promise<{ images: string[]; models: string[] } | null> {
+  const row = await prisma.product.findUnique({
+    where: { id },
+    select: {
+      modelGlbPublicId: true,
+      modelUsdzPublicId: true,
+      images: { select: { publicId: true } },
+    },
+  });
+  if (!row) return null;
+  return {
+    images: row.images.map((image) => image.publicId),
+    models: [row.modelGlbPublicId, row.modelUsdzPublicId].filter(
+      (publicId): publicId is string => Boolean(publicId),
+    ),
+  };
+}
+
+/**
+ * De `publicIds`, los que OTRO producto (distinto de `excludeProductId`)
+ * sigue usando del mismo tipo de asset — esos no se pueden borrar.
+ */
+export async function findAssetIdsUsedByOtherProducts(
+  kind: "image" | "raw",
+  publicIds: string[],
+  excludeProductId: string,
+): Promise<string[]> {
+  if (publicIds.length === 0) return [];
+
+  if (kind === "image") {
+    const rows = await prisma.productImage.findMany({
+      where: { publicId: { in: publicIds }, productId: { not: excludeProductId } },
+      select: { publicId: true },
+    });
+    return rows.map((row) => row.publicId);
+  }
+
+  const rows = await prisma.product.findMany({
+    where: {
+      id: { not: excludeProductId },
+      OR: [
+        { modelGlbPublicId: { in: publicIds } },
+        { modelUsdzPublicId: { in: publicIds } },
+      ],
+    },
+    select: { modelGlbPublicId: true, modelUsdzPublicId: true },
+  });
+  return rows.flatMap((row) =>
+    [row.modelGlbPublicId, row.modelUsdzPublicId].filter(
+      (publicId): publicId is string => Boolean(publicId),
+    ),
+  );
+}
