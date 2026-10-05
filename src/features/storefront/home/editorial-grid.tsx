@@ -75,7 +75,12 @@ function FeatureRow({ src, eyebrow, title, copy, reverse }: Feature) {
   );
 }
 
-export function EditorialGrid() {
+export function EditorialGrid({
+  showGallery = true,
+}: {
+  /** `false` oculta la galería de 4 fotos (cuando hay productos reales). */
+  showGallery?: boolean;
+}) {
   return (
     <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
       <div className="flex flex-col gap-20 sm:gap-28">
@@ -86,23 +91,25 @@ export function EditorialGrid() {
 
       {/* Mobile / tablet: strip horizontal con scroll-snap. `md` en
           adelante: grilla de 4. */}
-      <div className="-mx-4 mt-20 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:-mx-6 sm:mt-28 sm:px-6 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
-        {GALLERY.map((src) => (
-          <Link
-            key={src}
-            href="/productos"
-            className="group relative aspect-square w-[60vw] shrink-0 snap-start overflow-hidden rounded-sm border border-border/70 bg-muted sm:w-[40vw] md:w-auto"
-          >
-            <Image
-              src={src}
-              alt="Ambiente de baño con muebles de A Pura Madera"
-              fill
-              sizes="(min-width: 768px) 25vw, (min-width: 640px) 40vw, 60vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-            />
-          </Link>
-        ))}
-      </div>
+      {showGallery && (
+        <div className="-mx-4 mt-20 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:-mx-6 sm:mt-28 sm:px-6 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+          {GALLERY.map((src) => (
+            <Link
+              key={src}
+              href="/productos"
+              className="group relative aspect-square w-[60vw] shrink-0 snap-start overflow-hidden rounded-sm border border-border/70 bg-muted sm:w-[40vw] md:w-auto"
+            >
+              <Image
+                src={src}
+                alt="Ambiente de baño con muebles de A Pura Madera"
+                fill
+                sizes="(min-width: 768px) 25vw, (min-width: 640px) 40vw, 60vw"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              />
+            </Link>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

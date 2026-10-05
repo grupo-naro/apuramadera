@@ -132,6 +132,8 @@ export async function saveProduct(
   }
 
   revalidatePath("/admin/productos");
+  // La home muestra "Destacados": que se actualice sin esperar la hora de ISR.
+  revalidatePath("/");
   return { ok: true };
 }
 
@@ -140,5 +142,6 @@ export async function deleteProductAction(
 ): Promise<{ ok: true }> {
   await deleteProduct(productId);
   revalidatePath("/admin/productos");
+  revalidatePath("/");
   return { ok: true };
 }

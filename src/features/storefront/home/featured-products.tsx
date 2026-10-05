@@ -28,18 +28,26 @@ export function FeaturedProducts({
         </Link>
       </div>
 
-      {/* Mobile: strip horizontal con scroll-snap (sangría a los
-          bordes). `sm` en adelante: la grilla de siempre. */}
-      <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-x-4 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-        {products.map((product, index) => (
-          <div
-            key={product.id}
-            className="w-[72vw] shrink-0 snap-start sm:w-auto"
-          >
-            <ProductCard product={product} priority={index < 4} />
-          </div>
-        ))}
-      </div>
+      {/* Un solo producto: una tarjeta centrada, no pegada a la
+          izquierda de una grilla de 3-4 columnas. */}
+      {products.length === 1 ? (
+        <div className="mx-auto mt-10 w-full max-w-xs sm:max-w-sm">
+          <ProductCard product={products[0]} priority />
+        </div>
+      ) : (
+        // Mobile: strip horizontal con scroll-snap (sangría a los
+        // bordes). `sm` en adelante: la grilla de siempre.
+        <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-x-4 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className="w-[72vw] shrink-0 snap-start sm:w-auto"
+            >
+              <ProductCard product={product} priority={index < 4} />
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
