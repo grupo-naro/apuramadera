@@ -1,7 +1,7 @@
 /**
  * "Diseñados para tu baño" — tres tarjetas con foto (vanitorys,
- * espejos, a medida) que llevan al catálogo o al pedido a medida.
- * Las fotos salen de `public/`: se cambian reemplazando el archivo.
+ * espejos, tolvas organizadoras) que llevan al catálogo. Las fotos
+ * salen de `public/`: se cambian reemplazando el archivo.
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -23,18 +23,19 @@ const CARDS: CategoryCard[] = [
     href: "/productos",
   },
   {
-    src: "/a6.jpeg",
-    alt: "Espejo redondo con marco fino sobre un vanitory de madera",
+    src: "/a3.jpeg",
+    alt: "Espejo redondo de marco negro sobre un vanitory de madera",
     title: "Espejos",
     cta: "Ver modelos",
     href: "/productos",
   },
   {
-    src: "/a4.jpeg",
-    alt: "Vanitory de madera con cajones",
-    title: "A medida",
-    cta: "Contanos tu proyecto",
-    href: "/muebles-a-medida",
+    // Foto provisoria: organizador de madera con estantes en la pared.
+    src: "/a6.jpeg",
+    alt: "Organizador de madera con estantes colgado en la pared del baño",
+    title: "Tolvas organizadoras",
+    cta: "Ver modelos",
+    href: "/productos",
   },
 ];
 
@@ -72,7 +73,7 @@ export function CategoryCards() {
               className="absolute inset-0 bg-gradient-to-t from-foreground/75 via-foreground/10 to-transparent"
             />
             <div className="absolute inset-x-0 bottom-0 p-5 text-background">
-              <h3 className="text-sm font-medium uppercase tracking-[0.28em] sm:text-base">
+              <h3 className="text-sm font-medium uppercase leading-snug tracking-[0.24em] sm:text-base">
                 {card.title}
               </h3>
               <span className="mt-1.5 block text-sm text-background/90">
