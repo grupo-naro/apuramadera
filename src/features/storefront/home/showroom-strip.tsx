@@ -33,7 +33,7 @@ export function ShowroomStrip() {
         : { href: "/productos", label: "Ver la colección", external: false };
 
   return (
-    <section className="bg-primary text-primary-foreground">
+    <section id="showroom" className="scroll-mt-24 bg-primary text-primary-foreground">
       <div className="mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:py-32">
         <span className="text-[0.7rem] font-medium uppercase tracking-[0.3em] text-primary-foreground/70">
           Showroom

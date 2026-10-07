@@ -1,9 +1,10 @@
 /**
  * Header del storefront.
  *
- * La navegación de categorías sale de la base (query chica), así que
- * se renderiza inline — no vale la pena un <Suspense> para streamear
- * un fragmento tan pequeño.
+ * La navegación (las primeras categorías + A medida, Showroom y
+ * Contacto) sale de una query chica a la base, así que se renderiza
+ * inline — no vale la pena un <Suspense> para streamear un fragmento
+ * tan pequeño. Hasta 1024px el menú va en una segunda fila bajo el logo.
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -13,12 +14,15 @@ import { getCategoryTree } from "@/core/modules/catalog";
 import { Input } from "@/core/ui/input";
 import { CartButton } from "@/features/cart/cart-button";
 import { InstagramIcon } from "@/features/storefront/instagram-icon";
+import { buildNavItems, type NavItem } from "@/features/storefront/nav-items";
 import { storeConfig } from "@/store.config";
 
-export function Header() {
+export async function Header() {
+  const items = buildNavItems(await getCategoryTree());
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
-      <div className="mx-auto flex h-20 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6 lg:h-20">
         <Link
           href="/"
           aria-label={`${storeConfig.name} — inicio`}
@@ -32,15 +36,18 @@ export function Header() {
             width={132}
             height={66}
             priority
-            className="h-10 w-auto mix-blend-multiply"
+            className="h-8 w-auto mix-blend-multiply lg:h-10"
           />
         </Link>
 
-        <nav className="hidden flex-1 justify-center md:flex">
-          <CategoryNav />
+        <nav
+          aria-label="Menú principal"
+          className="hidden flex-1 justify-center lg:flex"
+        >
+          <NavLinks items={items} className="gap-7 text-[0.72rem] tracking-[0.18em]" />
         </nav>
 
-        <div className="ml-auto flex items-center gap-4 md:ml-0">
+        <div className="ml-auto flex items-center gap-4 lg:ml-0">
           <form action="/productos" className="hidden sm:block">
             <div className="relative">
               <SearchIcon className="pointer-events-none absolute left-0 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -69,30 +76,39 @@ export function Header() {
           <CartButton />
         </div>
       </div>
+
+      {/* Celular y tablet: el mismo menú en una segunda fila (sin hamburguesa). */}
+      <nav
+        aria-label="Menú principal"
+        className="border-t border-border/50 lg:hidden"
+      >
+        <NavLinks
+          items={items}
+          className="mx-auto max-w-6xl flex-wrap justify-between gap-x-2 gap-y-1 px-4 py-2 text-[0.6rem] tracking-[0.08em] sm:justify-center sm:gap-x-6 sm:text-[0.68rem] sm:tracking-[0.14em]"
+        />
+      </nav>
     </header>
   );
 }
 
-async function CategoryNav() {
-  const tree = await getCategoryTree();
-
+function NavLinks({
+  items,
+  className,
+}: {
+  items: NavItem[];
+  className: string;
+}) {
   return (
-    <ul className="flex items-center gap-7 text-[0.72rem] font-medium uppercase tracking-[0.18em]">
-      <li>
-        <Link
-          href="/productos"
-          className="text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Todo
-        </Link>
-      </li>
-      {tree.map((category) => (
-        <li key={category.id}>
+    <ul
+      className={`flex items-center font-medium uppercase ${className}`}
+    >
+      {items.map((item) => (
+        <li key={item.label}>
           <Link
-            href={`/productos?category=${category.slug}`}
+            href={item.href}
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            {category.name}
+            {item.label}
           </Link>
         </li>
       ))}

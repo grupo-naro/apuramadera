@@ -15,7 +15,7 @@ export function Footer() {
     contact.facebook;
 
   return (
-    <footer className="mt-24 border-t border-border/70 bg-secondary/40">
+    <footer id="contacto" className="mt-24 scroll-mt-24 border-t border-border/70 bg-secondary/40">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="max-w-xs">
           <p className="font-serif text-2xl tracking-tight">{name}</p>
