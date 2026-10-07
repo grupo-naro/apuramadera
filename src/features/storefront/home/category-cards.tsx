@@ -40,7 +40,7 @@ const CARDS: CategoryCard[] = [
 
 export function CategoryCards() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-28">
       <div className="text-center">
         <h2 className="text-xs font-medium uppercase tracking-[0.34em] sm:text-sm">
           Diseñados para tu baño
@@ -53,7 +53,7 @@ export function CategoryCards() {
       </div>
 
       {/* Mobile: tira horizontal con scroll-snap. `md` en adelante: 3 columnas. */}
-      <div className="-mx-4 mt-12 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
+      <div className="-mx-4 mt-8 flex snap-x sm:mt-12 snap-mandatory gap-3 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
         {CARDS.map((card) => (
           <Link
             key={card.title}

@@ -15,7 +15,7 @@ const QUALITIES = ["Madera real", "100% impermeabilizada", "Apta para agua y hum
 
 export function Hero() {
   return (
-    <section className="relative isolate flex min-h-[80vh] items-center overflow-hidden bg-foreground text-background">
+    <section className="relative isolate flex min-h-[58vh] items-center sm:min-h-[80vh] overflow-hidden bg-foreground text-background">
       <Image
         src="/a1.jpeg"
         alt="Vanitory de madera con frente de listones, bacha de apoyo y espejo redondo"
@@ -29,17 +29,17 @@ export function Hero() {
         className="absolute inset-0 -z-10 bg-gradient-to-r from-foreground/75 via-foreground/40 to-foreground/5"
       />
 
-      <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-20 sm:px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-12 sm:px-6 sm:pb-28 sm:pt-20">
         <span className="flex items-center gap-4 text-[0.7rem] font-medium uppercase tracking-[0.34em] text-background/80">
           Álamo macizo
           <span aria-hidden="true" className="h-px w-10 bg-background/60" />
         </span>
 
         <h1 className="mt-5 max-w-xl font-serif tracking-tight">
-          <span className="block text-5xl font-semibold uppercase leading-[1.02] sm:text-6xl lg:text-7xl">
+          <span className="block text-4xl font-semibold uppercase leading-[1.02] sm:text-6xl lg:text-7xl">
             Tu vanitory
           </span>
-          <span className="mt-2 block text-3xl font-normal leading-tight sm:text-5xl lg:text-6xl">
+          <span className="mt-2 block text-2xl font-normal leading-tight sm:text-5xl lg:text-6xl">
             Hecho para durar
           </span>
         </h1>
@@ -67,7 +67,7 @@ export function Hero() {
         </Link>
       </div>
 
-      <p className="absolute inset-x-0 bottom-6 mx-auto w-full max-w-6xl px-4 text-[0.65rem] font-medium uppercase tracking-[0.28em] text-background/75 sm:px-6">
+      <p className="absolute inset-x-0 bottom-10 mx-auto w-full max-w-6xl px-4 text-[0.65rem] font-medium uppercase tracking-[0.28em] text-background/75 sm:bottom-12 sm:px-6">
         Fabricantes · Showroom en Merlo
       </p>
     </section>
