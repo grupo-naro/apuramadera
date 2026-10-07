@@ -8,6 +8,7 @@
  */
 import { listProducts } from "@/core/modules/catalog";
 
+import { CategoryCards } from "./category-cards";
 import { CustomFurniture } from "./custom-furniture";
 import { EditorialGrid } from "./editorial-grid";
 import { FeaturedProducts } from "./featured-products";
@@ -26,6 +27,7 @@ export async function ApuraHome() {
   return (
     <>
       <Hero />
+      <CategoryCards />
       <Manifesto />
       {/* La galería de fotos de ilustración sólo se ve con el catálogo
           vacío; con productos, "Destacados" ocupa su lugar. */}
