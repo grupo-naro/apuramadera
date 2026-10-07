@@ -41,13 +41,13 @@ const CARDS: CategoryCard[] = [
 
 export function CategoryCards() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-28">
+    <section className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-28">
       <div className="text-center">
         <h2 className="text-xs font-medium uppercase tracking-[0.34em] sm:text-sm">
           Diseñados para tu baño
         </h2>
-        <span aria-hidden="true" className="mx-auto mt-5 block h-px w-12 bg-border" />
-        <p className="mx-auto mt-6 max-w-lg text-sm leading-relaxed text-muted-foreground">
+        <span aria-hidden="true" className="mx-auto mt-3 block h-px w-12 bg-border sm:mt-5" />
+        <p className="mx-auto mt-6 hidden max-w-lg text-sm leading-relaxed text-muted-foreground sm:block">
           Vanitorys en madera maciza, fabricados por nosotros. Elegí una medida
           estándar o diseñamos el mueble que necesitás.
         </p>
@@ -55,12 +55,12 @@ export function CategoryCards() {
 
       {/* Siempre 3 columnas, una al lado de la otra (sin carrusel). En
           celular las tarjetas son angostas y altas, con el texto más chico. */}
-      <div className="mt-8 grid grid-cols-3 gap-2 sm:mt-12 sm:gap-4">
+      <div className="mt-5 grid grid-cols-3 gap-2 sm:mt-12 sm:gap-4">
         {CARDS.map((card) => (
           <Link
             key={card.title}
             href={card.href}
-            className="group relative aspect-[3/4] overflow-hidden rounded-sm bg-muted sm:aspect-square"
+            className="group relative aspect-[4/5] overflow-hidden rounded-sm bg-muted sm:aspect-square"
           >
             <Image
               src={card.src}
