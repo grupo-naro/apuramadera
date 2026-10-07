@@ -1,5 +1,5 @@
 /**
- * Hero — foto de fondo (vanitory de listones con espejo redondo) y el
+ * Hero — foto de fondo (vanitory de madera clara con cajones y espejo redondo) y el
  * texto alineado a la izquierda sobre un degradé oscuro para que se lea.
  * Un kicker con el material, el titular "Tu vanitory / Hecho para
  * durar", las tres cualidades del mueble, el botón al catálogo y la
@@ -17,12 +17,14 @@ export function Hero() {
   return (
     <section className="relative isolate flex min-h-[58vh] items-center sm:min-h-[80vh] overflow-hidden bg-foreground text-background">
       <Image
-        src="/a1.jpeg"
-        alt="Vanitory de madera con frente de listones, bacha de apoyo y espejo redondo"
+        src="/a4.jpeg"
+        alt="Vanitory de madera clara con cajones, espejo redondo y ducha"
         fill
         priority
         sizes="100vw"
-        className="-z-20 object-cover object-[50%_72%]"
+        // scale-110 + origin-top recorta ~10% de abajo: a4.jpeg trae una marca
+        // de agua (estrella) en la esquina inferior derecha.
+        className="-z-20 origin-top scale-110 object-cover object-[50%_66%]"
       />
       <div
         aria-hidden="true"
