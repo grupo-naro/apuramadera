@@ -53,19 +53,19 @@ export function CategoryCards() {
         </p>
       </div>
 
-      {/* Mobile: tira horizontal con scroll-snap. `md` en adelante: 3 columnas. */}
-      <div className="-mx-4 mt-8 flex snap-x sm:mt-12 snap-mandatory gap-3 overflow-x-auto scroll-pl-4 px-4 no-scrollbar sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
+      {/* Celular: las 3 tarjetas apiladas, sin carrusel. `sm` en adelante: 3 columnas. */}
+      <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-12 sm:grid-cols-3 sm:gap-4">
         {CARDS.map((card) => (
           <Link
             key={card.title}
             href={card.href}
-            className="group relative aspect-square w-[72vw] shrink-0 snap-start overflow-hidden rounded-sm bg-muted sm:w-[44vw] md:w-auto"
+            className="group relative aspect-[4/3] overflow-hidden rounded-sm bg-muted sm:aspect-square"
           >
             <Image
               src={card.src}
               alt={card.alt}
               fill
-              sizes="(min-width: 768px) 33vw, (min-width: 640px) 44vw, 72vw"
+              sizes="(min-width: 640px) 33vw, 100vw"
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
             />
             <div
@@ -73,7 +73,7 @@ export function CategoryCards() {
               className="absolute inset-0 bg-gradient-to-t from-foreground/75 via-foreground/10 to-transparent"
             />
             <div className="absolute inset-x-0 bottom-0 p-5 text-background">
-              <h3 className="text-sm font-medium uppercase leading-snug tracking-[0.24em] sm:text-base">
+              <h3 className="text-sm font-medium uppercase leading-snug tracking-[0.24em] md:text-base">
                 {card.title}
               </h3>
               <span className="mt-1.5 block text-sm text-background/90">
