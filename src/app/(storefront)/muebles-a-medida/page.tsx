@@ -23,12 +23,14 @@ export default function MueblesAMedidaPage() {
           A medida
         </span>
         <h1 className="mt-3 font-serif text-3xl tracking-tight sm:text-4xl">
-          Muebles de baño a medida
+          Contanos tu proyecto
         </h1>
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          ¿Necesitás una pieza que no está en el catálogo? Fabricamos vanitorios,
-          bajo mesadas y muebles de baño en álamo macizo con tus medidas y
-          terminación. Contanos qué buscás y te pasamos un presupuesto.
+          Realizamos el asesoramiento que necesitás para que logremos juntos tu
+          mueble deseado.
+        </p>
+        <p className="mt-3 text-sm font-medium leading-relaxed sm:text-base">
+          ¡Contactanos y comencemos a trabajar juntos!
         </p>
       </div>
 
