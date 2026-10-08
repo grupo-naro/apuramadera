@@ -7,13 +7,13 @@
  * muestran si todavía está vacío.
  *
  * Orden: hero → franja de cualidades → tarjetas → calidad artesanal →
- * destacados → a medida → showroom.
+ * destacados → showroom. "A medida" no tiene sección en la home: se
+ * llega desde el menú del header (`/muebles-a-medida`).
  */
 import { listProducts } from "@/core/modules/catalog";
 
 import { CategoryCards } from "./category-cards";
 import { CraftQuality } from "./craft-quality";
-import { CustomFurniture } from "./custom-furniture";
 import { FeaturedProducts } from "./featured-products";
 import { FEATURED_FETCH_SIZE, selectFeatured } from "./featured-selection";
 import { Hero } from "./hero";
@@ -34,7 +34,6 @@ export async function ApuraHome() {
       <CategoryCards />
       <CraftQuality />
       {featured.length > 0 && <FeaturedProducts products={featured} />}
-      <CustomFurniture />
       <ShowroomStrip />
     </>
   );
