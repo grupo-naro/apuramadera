@@ -132,7 +132,7 @@ export const storeConfig: StoreConfig = {
     // Completar con el resto de los datos reales de la tienda:
     // email: "hola@apuramadera.com",
     // phone: "+54 11 0000-0000",
-     address: "Av. Rivadavia 24880, Merlo, Buenos Aires",
+    address: "Av. Pte Perón 24880 (ex Rivadavia), Merlo, Buenos Aires",
     // facebook: "https://facebook.com/apuramadera",
   },
   announcement: {

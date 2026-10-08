@@ -44,7 +44,9 @@ export function Hero() {
           </span>
         </h1>
 
-        <ul className="mt-4 flex flex-col gap-1 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-background/90 sm:mt-7 sm:text-xs md:flex-row md:flex-wrap md:items-center md:gap-x-4 md:gap-y-1">
+        {/* En celular se omite: la franja de íconos de abajo dice lo mismo
+            y así el hero y las tarjetas siguen entrando en la primera pantalla. */}
+        <ul className="mt-7 hidden gap-1 text-xs font-medium uppercase tracking-[0.2em] text-background/90 md:flex md:flex-row md:flex-wrap md:items-center md:gap-x-4 md:gap-y-1">
           {QUALITIES.map((quality, index) => (
             <li key={quality} className="flex items-center gap-4">
               {/* Separador sólo cuando van en fila (md+): apilados no hace falta. */}

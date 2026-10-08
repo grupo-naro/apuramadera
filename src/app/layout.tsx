@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { Caveat, Fraunces, Geist, Geist_Mono } from "next/font/google";
 
 import { SITE_URL } from "@/core/lib/seo";
 import { ThemeStyle } from "@/core/theme/theme-style";
@@ -26,6 +26,14 @@ const fraunces = Fraunces({
   style: ["normal", "italic"],
 });
 
+// Manuscrita — sólo para firmas sobre fotos ("Fábrica a la vista"),
+// utilidad `font-script`.
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 // Metadata por defecto del framework. Cada página la extiende; la
 // identidad concreta (nombre/descripción/locale) sale de `store.config.ts`.
 export const metadata: Metadata = {
@@ -50,7 +58,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${caveat.variable} h-full`}
     >
       <head>
         <ThemeStyle />
