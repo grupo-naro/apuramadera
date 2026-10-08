@@ -6,6 +6,7 @@
  * inline — no vale la pena un <Suspense> para streamear un fragmento
  * tan pequeño. El menú comparte fila con el logo en todos los tamaños.
  * Sin ícono de carrito: el cajón sólo se abre al agregar un producto.
+ * El buscador sólo se muestra desde 1024px; Instagram, en todos los tamaños.
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -50,7 +51,7 @@ export async function Header() {
           />
         </nav>
 
-        <div className="hidden items-center gap-4 sm:flex">
+        <div className="flex shrink-0 items-center gap-4">
           <form action="/productos" className="hidden lg:block">
             <div className="relative">
               <SearchIcon className="pointer-events-none absolute left-0 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
