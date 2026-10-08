@@ -2,8 +2,9 @@
  * Hero — foto de fondo (vanitory de listones con espejo redondo) y el
  * texto alineado a la izquierda sobre un degradé oscuro para que se lea.
  * Un kicker con el material, el titular "Tu vanitory / Hecho para
- * durar", las tres cualidades del mueble, el botón al catálogo y la
- * ubicación del taller.
+ * durar" (misma altura de letra en las dos líneas: la primera en
+ * semibold y la segunda en peso normal), las tres cualidades del
+ * mueble, el botón al catálogo y la ubicación del taller.
  *
  * Los colores salen de los tokens del tema (`foreground` es el tono
  * oscuro de la marca y `background` el hueso), no de colores literales.
@@ -30,28 +31,33 @@ export function Hero() {
       />
 
       <div className="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 sm:px-6 sm:pb-28 sm:pt-20">
-        <span className="flex items-center gap-4 text-[0.7rem] font-medium uppercase tracking-[0.34em] text-background/80">
+        <span className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-background/80 sm:gap-4 sm:text-[0.7rem] sm:tracking-[0.34em]">
           Álamo macizo
-          <span aria-hidden="true" className="h-px w-10 bg-background/60" />
+          <span aria-hidden="true" className="h-px w-8 bg-background/60 sm:w-10" />
         </span>
 
-        <h1 className="mt-4 max-w-xl sm:mt-5 font-serif tracking-tight">
-          <span className="block text-4xl font-semibold uppercase leading-[1.02] sm:text-6xl lg:text-7xl">
+        <h1 className="mt-3 max-w-xl font-serif leading-[1.1] tracking-tight sm:mt-5 sm:leading-[1.06]">
+          <span className="block text-[1.7rem] font-semibold sm:text-5xl lg:text-6xl">
             Tu vanitory
           </span>
-          <span className="mt-2 block text-2xl font-normal leading-tight sm:text-5xl lg:text-6xl">
+          <span className="block text-[1.7rem] font-normal sm:text-5xl lg:text-6xl">
             Hecho para durar
           </span>
         </h1>
 
-        {/* En celular se omite: la franja de íconos de abajo dice lo mismo
-            y así el hero y las tarjetas siguen entrando en la primera pantalla. */}
-        <ul className="mt-7 hidden gap-1 text-xs font-medium uppercase tracking-[0.2em] text-background/90 md:flex md:flex-row md:flex-wrap md:items-center md:gap-x-4 md:gap-y-1">
+        {/* Celular: dos renglones (las dos primeras juntas, la tercera
+            abajo). Desde md, los tres en una fila con separadores. */}
+        <ul className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6rem] font-medium uppercase tracking-[0.16em] text-background/90 sm:mt-7 sm:text-xs sm:tracking-[0.2em] md:gap-x-4">
           {QUALITIES.map((quality, index) => (
-            <li key={quality} className="flex items-center gap-4">
-              {/* Separador sólo cuando van en fila (md+): apilados no hace falta. */}
+            <li
+              key={quality}
+              className={`flex items-center gap-3 md:gap-4 ${index === 2 ? "basis-full md:basis-auto" : ""}`}
+            >
               {index > 0 && (
-                <span aria-hidden="true" className="hidden text-background/50 md:inline">
+                <span
+                  aria-hidden="true"
+                  className={`text-background/50 ${index === 2 ? "hidden md:inline" : ""}`}
+                >
                   |
                 </span>
               )}
@@ -62,7 +68,7 @@ export function Hero() {
 
         <Link
           href="/productos"
-          className="mt-5 inline-flex items-center gap-3 bg-background px-7 py-2.5 text-xs sm:mt-10 sm:py-4 font-medium uppercase tracking-[0.22em] text-foreground transition-colors hover:bg-background/90"
+          className="mt-5 inline-flex items-center gap-3 bg-background px-6 py-2.5 text-[0.65rem] font-medium uppercase tracking-[0.22em] text-foreground transition-colors hover:bg-background/90 sm:mt-10 sm:px-7 sm:py-4 sm:text-xs"
         >
           Ver vanitorys
           <span aria-hidden="true">→</span>
