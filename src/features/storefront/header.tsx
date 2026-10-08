@@ -4,9 +4,12 @@
  * La navegación (las primeras categorías + A medida, Showroom y
  * Contacto) sale de una query chica a la base, así que se renderiza
  * inline — no vale la pena un <Suspense> para streamear un fragmento
- * tan pequeño. El menú comparte fila con el logo en todos los tamaños.
+ * tan pequeño.
+ *
+ * Celular y tablet (hasta 1024px): logo a la izquierda y, a la derecha,
+ * el botón del menú hamburguesa y el ícono de Instagram. Desde 1024px:
+ * los links centrados en el header y el buscador.
  * Sin ícono de carrito: el cajón sólo se abre al agregar un producto.
- * El buscador sólo se muestra desde 1024px; Instagram, en todos los tamaños.
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -15,6 +18,7 @@ import { SearchIcon } from "lucide-react";
 import { getCategoryTree } from "@/core/modules/catalog";
 import { Input } from "@/core/ui/input";
 import { InstagramIcon } from "@/features/storefront/instagram-icon";
+import { MobileMenu } from "@/features/storefront/mobile-menu";
 import { buildNavItems, type NavItem } from "@/features/storefront/nav-items";
 import { storeConfig } from "@/store.config";
 
@@ -23,7 +27,7 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
-      <div className="mx-auto flex min-h-14 max-w-6xl items-center gap-3 px-4 py-2 sm:gap-6 sm:px-6 lg:h-20 lg:py-0">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6 lg:h-20">
         <Link
           href="/"
           aria-label={`${storeConfig.name} — inicio`}
@@ -41,17 +45,12 @@ export async function Header() {
           />
         </Link>
 
-        {/* Un solo menú, en la misma fila que el logo: a la derecha y
-            en dos renglones si hace falta en celular; centrado en
-            escritorio. */}
-        <nav aria-label="Menú principal" className="flex-1">
-          <NavLinks
-            items={items}
-            className="flex-wrap justify-end gap-x-3 gap-y-0.5 text-[0.55rem] tracking-[0.04em] sm:gap-x-5 sm:text-[0.68rem] sm:tracking-[0.14em] lg:justify-center lg:gap-7 lg:text-[0.72rem] lg:tracking-[0.18em]"
-          />
+        {/* Escritorio: los links centrados en el header. */}
+        <nav aria-label="Menú principal" className="hidden flex-1 lg:block">
+          <NavLinks items={items} />
         </nav>
 
-        <div className="flex shrink-0 items-center gap-4">
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:ml-0 lg:gap-4">
           <form action="/productos" className="hidden lg:block">
             <div className="relative">
               <SearchIcon className="pointer-events-none absolute left-0 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -65,13 +64,16 @@ export async function Header() {
             </div>
           </form>
 
+          {/* Celular y tablet: menú hamburguesa (oculto desde lg). */}
+          <MobileMenu items={items} />
+
           {storeConfig.contact.instagram && (
             <a
               href={`https://instagram.com/${storeConfig.contact.instagram}`}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Seguinos en Instagram"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex size-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
             >
               <InstagramIcon className="size-5" />
             </a>
@@ -82,17 +84,9 @@ export async function Header() {
   );
 }
 
-function NavLinks({
-  items,
-  className,
-}: {
-  items: NavItem[];
-  className: string;
-}) {
+function NavLinks({ items }: { items: NavItem[] }) {
   return (
-    <ul
-      className={`flex items-center font-medium uppercase ${className}`}
-    >
+    <ul className="flex items-center justify-center gap-7 text-[0.72rem] font-medium uppercase tracking-[0.18em]">
       {items.map((item) => (
         <li key={item.label}>
           <Link
