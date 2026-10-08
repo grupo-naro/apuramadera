@@ -1,5 +1,5 @@
 /**
- * Hero — foto de fondo (vanitory de madera clara con cajones y espejo redondo) y el
+ * Hero — foto de fondo (vanitory de listones con espejo redondo) y el
  * texto alineado a la izquierda sobre un degradé oscuro para que se lea.
  * Un kicker con el material, el titular "Tu vanitory / Hecho para
  * durar", las tres cualidades del mueble, el botón al catálogo y la
@@ -17,14 +17,12 @@ export function Hero() {
   return (
     <section className="relative isolate flex items-center sm:min-h-[80vh] overflow-hidden bg-foreground text-background">
       <Image
-        src="/a4.jpeg"
-        alt="Vanitory de madera clara con cajones, espejo redondo y ducha"
+        src="/a1.jpeg"
+        alt="Vanitory de madera con frente de listones, bacha de apoyo y espejo redondo"
         fill
         priority
         sizes="100vw"
-        // scale-110 + origin-top recorta ~10% de abajo: a4.jpeg trae una marca
-        // de agua (estrella) en la esquina inferior derecha.
-        className="-z-20 origin-top scale-110 object-cover object-[50%_66%]"
+        className="-z-20 object-cover object-[50%_72%]"
       />
       <div
         aria-hidden="true"
@@ -46,12 +44,12 @@ export function Hero() {
           </span>
         </h1>
 
-        <ul className="mt-4 flex flex-col gap-1 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-background/90 sm:mt-7 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1 sm:text-xs">
+        <ul className="mt-4 flex flex-col gap-1 text-[0.68rem] font-medium uppercase tracking-[0.2em] text-background/90 sm:mt-7 sm:text-xs md:flex-row md:flex-wrap md:items-center md:gap-x-4 md:gap-y-1">
           {QUALITIES.map((quality, index) => (
             <li key={quality} className="flex items-center gap-4">
-              {/* Separador sólo en fila (sm+): apilado en celular no hace falta. */}
+              {/* Separador sólo cuando van en fila (md+): apilados no hace falta. */}
               {index > 0 && (
-                <span aria-hidden="true" className="hidden text-background/50 sm:inline">
+                <span aria-hidden="true" className="hidden text-background/50 md:inline">
                   |
                 </span>
               )}
