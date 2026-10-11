@@ -12,6 +12,8 @@
  * Tarifas en centavos (500000 = $5.000).
  */
 
+import { storeConfig } from "@/store.config";
+
 export interface ShippingZoneConfig {
   id: string;
   label: string;
@@ -21,12 +23,25 @@ export interface ShippingZoneConfig {
   localities: string[];
 }
 
-/** Retiro en el local (sin costo). Poné `enabled: false` para ocultarlo. */
+/**
+ * Retiro en sucursal (sin costo). Poné `enabled: false` para ocultarlo.
+ * La dirección sale de `store.config.ts` (`contact.address`), así está
+ * en un solo lugar.
+ */
 export const PICKUP = {
   enabled: true,
-  label: "Retiro en el local",
-  description: "Coordinás el retiro con la tienda después de la compra.",
+  label: "Retiro en sucursal",
+  description: storeConfig.contact.address
+    ? `Retirás en nuestro showroom: ${storeConfig.contact.address}. Coordinás el día y el horario con la tienda después de la compra.`
+    : "Coordinás el retiro con la tienda después de la compra.",
 };
+
+/**
+ * ¿Se ofrece envío a domicilio por zona? Por ahora NO: la tienda sólo
+ * trabaja con retiro en sucursal. Poné `true` para volver a ofrecer las
+ * zonas de abajo (siguen cargadas).
+ */
+export const DELIVERY_ENABLED = false;
 
 /** Zonas de envío a domicilio, de menor a mayor tarifa. */
 export const SHIPPING_ZONES: ShippingZoneConfig[] = [

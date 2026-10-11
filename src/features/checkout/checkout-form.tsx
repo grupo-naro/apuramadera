@@ -80,7 +80,8 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
       email: "",
       customerName: "",
       phone: "",
-      shippingMethodId: "",
+      // Con un único método (retiro en sucursal) queda preseleccionado.
+      shippingMethodId: methods.length === 1 ? methods[0].id : "",
       recipient: "",
       street: "",
       apartment: "",

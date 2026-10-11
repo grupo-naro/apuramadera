@@ -2,10 +2,10 @@ import { expect, test } from "@playwright/test";
 
 /**
  * Flow completo de compra: agregar al carrito → checkout → submit con
- * "Retiro en el local" (sin dirección) → llegar a la página de la orden.
+ * "Retiro en sucursal" (sin dirección) → llegar a la página de la orden.
  * Crea una orden REAL en la base — los tests no limpian. Documentado.
  */
-test("checkout con retiro en el local crea una orden y redirige a /orden/:id", async ({
+test("checkout con retiro en sucursal crea una orden y redirige a /orden/:id", async ({
   page,
 }) => {
   // 1) Agregar un producto al carrito.
@@ -32,8 +32,8 @@ test("checkout con retiro en el local crea una orden y redirige a /orden/:id", a
   await page.getByLabel(/nombre y apellido/i).fill("E2E Tester");
   await page.getByLabel(/teléfono/i).fill("1122334455");
 
-  // 4) Método de envío — retiro en el local (es el primer radio).
-  const pickupRadio = page.getByLabel(/retiro en el local/i);
+  // 4) Método de envío — retiro en sucursal (único método; viene preseleccionado).
+  const pickupRadio = page.getByLabel(/retiro en sucursal/i);
   await pickupRadio.click();
 
   // 5) Submit por canal "online" (sin MP conectado, redirige a /orden/:id).

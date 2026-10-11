@@ -10,6 +10,7 @@ import { buttonVariants } from "@/core/ui/button";
 import { OrderStatusBadge } from "@/core/ui/commerce/order-status-badge";
 import { StoreImage } from "@/core/ui/store-image";
 import { PurchaseTracker } from "@/features/storefront/purchase-tracker";
+import { storeConfig } from "@/store.config";
 
 export const metadata: Metadata = {
   title: "Pedido confirmado",
@@ -157,7 +158,11 @@ export default async function OrderPage({ params }: OrderPageProps) {
                 {order.shipping.postalCode})
               </span>
             ) : (
-              <span className="text-muted-foreground">Retiro en el local.</span>
+              <span className="text-muted-foreground">
+                {storeConfig.contact.address
+                  ? `Showroom: ${storeConfig.contact.address}.`
+                  : "Coordinás el retiro con la tienda."}
+              </span>
             )}
             {order.shipping.notes && (
               <span className="mt-1 text-muted-foreground">

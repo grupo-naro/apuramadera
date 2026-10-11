@@ -7,7 +7,7 @@
  * `findShippingMethod` — el costo SIEMPRE se resuelve en el servidor,
  * nunca se confía en el monto que manda el cliente.
  */
-import { PICKUP, SHIPPING_ZONES } from "./shipping.config";
+import { DELIVERY_ENABLED, PICKUP, SHIPPING_ZONES } from "./shipping.config";
 
 export type ShippingMethodKind = "pickup" | "delivery";
 
@@ -34,7 +34,8 @@ export function getShippingMethods(): ShippingMethod[] {
     });
   }
 
-  for (const zone of SHIPPING_ZONES) {
+  // Sin envío a domicilio: el servidor tampoco acepta ids `delivery-*`.
+  for (const zone of DELIVERY_ENABLED ? SHIPPING_ZONES : []) {
     methods.push({
       id: `delivery-${zone.id}`,
       label: `Envío a domicilio · ${zone.label}`,
